@@ -155,27 +155,23 @@ class Poly{
             // std::cout<<"Eroor"<<std::endl;
             int size_dividend = this->term_sp_dividend.size();
             int matchin_inde = -1; // Not Defined
-            std::cout<<"FUnction"<<std::endl;
             for (int inde = 0; inde < size_dividend; inde++){
-                std::cout<<this->term_sp_dividend.at(inde).give_in_string()<<"\t"<<matching_term.give_in_string()<<std::endl;
                 if(this->term_sp_dividend.at(inde).var_pow == matching_term.var_pow){
                     return inde;
                 }
                 if(matchin_inde < 0){
-                    // std::cout<<"True232"<<std::endl;
                     if(inde - 1 == -1){
                         if(this->term_sp_dividend.at(inde).var_pow < matching_term.var_pow){
                             matchin_inde = inde;
                         }
                     }
-                    else if(inde + 1 == size_dividend){
+                    if(inde + 1 == size_dividend){
                         if(this->term_sp_dividend.at(inde).var_pow > matching_term.var_pow){
                             matchin_inde = inde;
                         }
                     }
                     else{
                         if(this->term_sp_dividend.at(inde).var_pow < matching_term.var_pow && this->term_sp_dividend.at(inde+1).var_pow > matching_term.var_pow){
-                            std::cout<<"COnid"<<std::endl;
                             matchin_inde = inde+1;
                         }
                     }
@@ -186,8 +182,8 @@ class Poly{
             default_term.var_pow = matching_term.var_pow;
             default_term.coefficient = 0;
             default_term.variable = this->variable;
+            if(size_dividend == 0){matchin_inde = 0;}
             this->term_sp_dividend.insert(this->term_sp_dividend.begin()+matchin_inde,default_term);
-            std::cout<<"dfadsfa"<<matchin_inde<<std::endl;
             return matchin_inde;
         }
     public:
@@ -234,29 +230,24 @@ std::vector<std::string> Poly::divide(){
     std::vector<Term> &dividend = this->term_sp_dividend;
     int divisor_degree = this->term_sp_divisor.at(0).var_pow;
     int nOfDivsTerm = this->term_sp_divisor.size();
-    std::cout<<nOfDivsTerm<<std::endl;
+
     Term quoitent_term;
 
     while(this->max_poly()){
-        std::cout<<this->max_poly()<<std::endl;
         if(dividend.at(0).coefficient % divisor.at(0).coefficient!=0){
             perror("Currently We don't Support a fraction quoitent");
             break;
         }
         else{
-            std::cout<<"R32"<<std::endl;
             quoitent_term.coefficient = dividend.at(0).coefficient/divisor.at(0).coefficient;
             quoitent_term.variable = this->variable;
             quoitent_term.var_pow = dividend.at(0).var_pow - divisor_degree;
             dividend.erase(dividend.begin());
             quiotent.push_back(quoitent_term);
-            std::cout<<"R32"<<std::endl;
 
             // Iterating all the factors that i could create from divisor and then subtracting through dividend
             for (int n_trav = 1; n_trav < nOfDivsTerm; n_trav++){
-            std::cout<<"E2"<<std::endl;
             // n_trav means no of traveled
-            std::cout<<"Loggin:"<<divisor.at(n_trav).var_pow<<std::endl;
                 Term faOfDvTe; // Means Factor of divsion term
                 faOfDvTe.variable = this->variable;
                 faOfDvTe.var_pow = quoitent_term.var_pow+divisor.at(n_trav).var_pow;
@@ -264,7 +255,7 @@ std::vector<std::string> Poly::divide(){
 
                 int matching_term_index = this->give_same_power_term(faOfDvTe);
                 dividend.at(matching_term_index).coefficient = dividend.at(matching_term_index).coefficient - faOfDvTe.coefficient;
-                std::cout<<"E232"<<std::endl;
+
                 if(dividend.at(matching_term_index).coefficient == 0){
                     dividend.erase(dividend.begin()+matching_term_index);
                 }
@@ -284,9 +275,7 @@ void Poly::print_equation(std::vector<Term> &param_equation){
 }
 bool Poly::max_poly(){
     /* Give you true if dividend degree is greater or equal to divisor */
-    std::cout<<"Returned"<<std::endl;
     if(this->term_sp_dividend.size() > 0){ // Other Wise Reminder is 0
-        std::cout<<"Returned23"<<std::endl;
         if(this->term_sp_dividend.at(0).var_pow >= this->term_sp_divisor.at(0).var_pow){
             return true;
         }
@@ -296,9 +285,12 @@ bool Poly::max_poly(){
     
 
 int main(){
-    // Poly("-x^2+x-1","-x^3+3x^2-3x+5",'x');
-    // Poly("x^2-2","2x^4-3x^3-3x^2+6x-2",'x');
-    // Poly("x^2-2","x^3-3x^2+5x-3",'x');
+    Poly("-x^2+x-1","-x^3+3x^2-3x+5",'x');
+    Poly("x^2-2","2x^4-3x^3-3x^2+6x-2",'x');
+    Poly("x^2-2","x^3-3x^2+5x-3",'x');
     Poly("2-x^2","x^4-5x+6",'x');
+    Poly("x^2-2","x^4",'x');
+    Poly("x^2-2","x^4+x^3",'x');
+    Poly("x+1","x^3+1",'x');
     return 0;
 }
