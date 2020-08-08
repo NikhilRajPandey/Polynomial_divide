@@ -182,13 +182,13 @@ class Poly{
         std::vector<std::string> divide();
         bool max_poly();
         void conv_standard(std::vector<Term> &equation_address);
+        void print_equation(std::vector<Term> &param_equation);
 };
 
 Poly::Poly(std::string divisor,std::string dividend,char param_variable){
     this->variable = param_variable;
     this->seprate_term_parts(this->term_sp_divisor,this->split_eq(divisor));
     this->seprate_term_parts(this->term_sp_dividend,this->split_eq(dividend));
-    // std::cout<<this->term_sp_divisor.at(0).coefficient<<this->term_sp_divisor.at(0).var_pow<<std::endl;
     this->conv_standard(this->term_sp_divisor);
     this->conv_standard(this->term_sp_dividend);
 
@@ -218,9 +218,8 @@ std::vector<std::string> Poly::divide(){
     int nOfDivsTerm = this->term_sp_divisor.size();
     Term quoitent_term;
 
-    std::cout<<this->max_poly()<<" SDF# "<<dividend.at(0).give_in_string()<<std::endl;
-    while(this->max_poly()){        
-        if(dividend.at(0).coefficient % divisor_degree!=0){
+    while(this->max_poly()){
+        if(dividend.at(0).coefficient % divisor.at(0).coefficient!=0){
             perror("Currently We don't Support a fraction quoitent");
             break;
         }
@@ -238,12 +237,8 @@ std::vector<std::string> Poly::divide(){
                 faOfDvTe.var_pow = quoitent_term.var_pow+divisor.at(n_trav).var_pow;
                 faOfDvTe.coefficient = quoitent_term.coefficient * divisor.at(n_trav).coefficient;
 
-                std::cout<<faOfDvTe.give_in_string()<<std::endl;
-
                 int matching_term_index = this->give_same_power_term(faOfDvTe);
                 dividend.at(matching_term_index).coefficient = dividend.at(matching_term_index).coefficient - faOfDvTe.coefficient;
-
-                std::cout<<"DIV\t"<<dividend.at(matching_term_index).give_in_string()<<std::endl;
 
                 if(dividend.at(matching_term_index).coefficient == 0){
                     dividend.erase(dividend.begin()+matching_term_index);
@@ -251,21 +246,30 @@ std::vector<std::string> Poly::divide(){
             }
         }
     }
-    std::cout<<this->max_poly()<<" SDF# "<<dividend.at(0).give_in_string()<<std::endl;
-    std::cout<<quiotent.at(1).give_in_string()<<std::endl;
-    // std::cout<<quiotent.at(0).coefficient<<std::endl;
+    this->print_equation(quiotent);
+    this->print_equation(dividend);
+    
+}
+void Poly::print_equation(std::vector<Term> &param_equation){
+    for (int i = 0; i < param_equation.size(); i++){
+        std::cout<<param_equation.at(i).give_in_string();
+    }
+    std::cout<<"\n";
     
 }
 bool Poly::max_poly(){
     /* Give you true if dividend degree is greater or equal to divisor */
-    if(this->term_sp_dividend.at(0).var_pow >= this->term_sp_divisor.at(0).var_pow){
-        return true;
+    if(this->term_sp_dividend.size() > 0){ // Other Wise Reminder is 0
+        if(this->term_sp_dividend.at(0).var_pow >= this->term_sp_divisor.at(0).var_pow){
+            return true;
+        }
     }
     return false;
 }
     
 
 int main(){
-    Poly("x+2","2x^2+3x+1",'x');
+    // Poly("-x^2+x-1","-x^3+3x^2-3x+5",'x');
+    Poly("x^2-2","2x^4-3x^3-3x^2+6x-2",'x');
     return 0;
 }
