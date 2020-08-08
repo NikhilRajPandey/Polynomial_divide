@@ -14,12 +14,13 @@ struct Term{
 };
 std::string Term::give_in_string(){
     std::string returning_;
-    if(this->coefficient > 0){returning_.append(std::to_string('+'));}
+    if(this->coefficient > 0){
+        returning_.append("+");
+    }
 
     returning_.append(std::to_string(this->coefficient));
     if(this->var_pow !=0){
-        returning_.append(std::to_string(this->variable));
-
+        returning_.append(1,this->variable);
         if(this->var_pow > 1){
             returning_.append("^");
             returning_.append(std::to_string(this->var_pow));
@@ -168,8 +169,8 @@ class Poly{
             default_term.var_pow = matching_term.var_pow;
             default_term.coefficient = 0;
             default_term.variable = this->variable;
-            this->term_sp_dividend.insert(matchin_inde,default_term);
-            return matchin_inde;          
+            this->term_sp_dividend.insert(this->term_sp_dividend.begin()+matchin_inde,default_term);
+            return matchin_inde;
         }
     public:
         char variable;
@@ -178,7 +179,7 @@ class Poly{
 
         Poly(std::string divisor,std::string dividend,char param_variable);
         // Notice Your Equation should be in the standard form if it is not then call conv_stand
-        std::array<std::string,2> divide();
+        std::vector<std::string> divide();
         bool max_poly();
         void conv_standard(std::vector<Term> &equation_address);
 };
@@ -186,8 +187,12 @@ class Poly{
 Poly::Poly(std::string divisor,std::string dividend,char param_variable){
     this->variable = param_variable;
     this->seprate_term_parts(this->term_sp_divisor,this->split_eq(divisor));
+    this->seprate_term_parts(this->term_sp_dividend,this->split_eq(dividend));
     // std::cout<<this->term_sp_divisor.at(0).coefficient<<this->term_sp_divisor.at(0).var_pow<<std::endl;
-    this->conv_standard(term_sp_divisor);
+    this->conv_standard(this->term_sp_divisor);
+    this->conv_standard(this->term_sp_dividend);
+
+    this->divide();
     // this->print_tersms();
 }
 void Poly::conv_standard(std::vector<Term> &equation_address){
@@ -201,7 +206,7 @@ void Poly::conv_standard(std::vector<Term> &equation_address){
         equation_address.at(min_inde) = cache;
     }
 }
-std::array<std::string,2> Poly::divide(){
+std::vector<std::string> Poly::divide(){
     // This will return {quoitent,reminder}
 
     std::vector<Term> quiotent; // Quoitent will be made up of multiple term like 4x+2
@@ -211,10 +216,11 @@ std::array<std::string,2> Poly::divide(){
     std::vector<Term> &dividend = this->term_sp_dividend;
     int divisor_degree = this->term_sp_divisor.at(0).var_pow;
     int nOfDivsTerm = this->term_sp_divisor.size();
-
     Term quoitent_term;
+
+    std::cout<<this->max_poly()<<" SDF# "<<dividend.at(0).give_in_string()<<std::endl;
     while(this->max_poly()){        
-        if(dividend.at(0).coefficient % divisor.at(0).coefficient!=0){
+        if(dividend.at(0).coefficient % divisor_degree!=0){
             perror("Currently We don't Support a fraction quoitent");
             break;
         }
@@ -225,28 +231,34 @@ std::array<std::string,2> Poly::divide(){
             dividend.erase(dividend.begin());
             quiotent.push_back(quoitent_term);
             // Iterating all the factors that i could create from divisor and then subtracting through dividend
-            for (int n_trav = 0; n_trav < nOfDivsTerm; n_trav++){
+            for (int n_trav = 1; n_trav < nOfDivsTerm; n_trav++){
             // n_trav means no of traveled
                 Term faOfDvTe; // Means Factor of divsion term
                 faOfDvTe.variable = this->variable;
                 faOfDvTe.var_pow = quoitent_term.var_pow+divisor.at(n_trav).var_pow;
-                faOfDvTe.coefficient = -1*quoitent_term.coefficient * divisor.at(n_trav).coefficient;
+                faOfDvTe.coefficient = quoitent_term.coefficient * divisor.at(n_trav).coefficient;
+
+                std::cout<<faOfDvTe.give_in_string()<<std::endl;
+
                 int matching_term_index = this->give_same_power_term(faOfDvTe);
                 dividend.at(matching_term_index).coefficient = dividend.at(matching_term_index).coefficient - faOfDvTe.coefficient;
 
+                std::cout<<"DIV\t"<<dividend.at(matching_term_index).give_in_string()<<std::endl;
+
+                if(dividend.at(matching_term_index).coefficient == 0){
+                    dividend.erase(dividend.begin()+matching_term_index);
+                }
             }
         }
     }
+    std::cout<<this->max_poly()<<" SDF# "<<dividend.at(0).give_in_string()<<std::endl;
+    std::cout<<quiotent.at(1).give_in_string()<<std::endl;
+    // std::cout<<quiotent.at(0).coefficient<<std::endl;
     
 }
 bool Poly::max_poly(){
-    /* Give you true if dividend is greater or equal to divisor */
-    if(this->term_sp_dividend.at(0).var_pow == this->term_sp_dividend.at(0).var_pow){
-        if(this->term_sp_dividend.at(0).coefficient >= this->term_sp_dividend.at(0).coefficient){
-            return true;
-        }
-    }
-    else if(this->term_sp_dividend.at(0).var_pow >= this->term_sp_dividend.at(0).var_pow){
+    /* Give you true if dividend degree is greater or equal to divisor */
+    if(this->term_sp_dividend.at(0).var_pow >= this->term_sp_divisor.at(0).var_pow){
         return true;
     }
     return false;
@@ -254,6 +266,6 @@ bool Poly::max_poly(){
     
 
 int main(){
-    Poly("-256-423x^32+6","4x^2-3x^1+42",'x');
+    Poly("x+2","2x^2+3x+1",'x');
     return 0;
 }
