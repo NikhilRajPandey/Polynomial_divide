@@ -196,7 +196,7 @@ class Poly{
         std::vector<std::string> divide();
         bool max_poly();
         void conv_standard(std::vector<Term> &equation_address);
-        void print_equation(std::vector<Term> &param_equation);
+        std::string build_equation_from_terms(std::vector<Term> &param_equation);
 };
 
 Poly::Poly(std::string divisor,std::string dividend,char param_variable){
@@ -206,8 +206,6 @@ Poly::Poly(std::string divisor,std::string dividend,char param_variable){
     this->conv_standard(this->term_sp_divisor);
     this->conv_standard(this->term_sp_dividend);
 
-    this->divide();
-    // this->print_tersms();
 }
 void Poly::conv_standard(std::vector<Term> &equation_address){
     // This will sort the term in terms of degrees/power
@@ -222,7 +220,7 @@ void Poly::conv_standard(std::vector<Term> &equation_address){
 }
 std::vector<std::string> Poly::divide(){
     // This will return {quoitent,reminder}
-
+    
     std::vector<Term> quiotent; // Quoitent will be made up of multiple term like 4x+2
     /* Now implementing the Normal Divison Algorithm that is shown in X Class Math Book */
     // Read max_poly code
@@ -262,15 +260,17 @@ std::vector<std::string> Poly::divide(){
             }
         }
     }
-    this->print_equation(quiotent);
-    this->print_equation(dividend);
+    // The terms that function not divided it will be in the dividend that will be our reminder
+    return {this->build_equation_from_terms(quiotent),this->build_equation_from_terms(dividend)};
     
 }
-void Poly::print_equation(std::vector<Term> &param_equation){
+std::string Poly::build_equation_from_terms(std::vector<Term> &param_equation){
+    // It will just join all the terms and give the quation
+    std::string returning_;
     for (int i = 0; i < param_equation.size(); i++){
-        std::cout<<param_equation.at(i).give_in_string();
+        returning_.append(param_equation.at(i).give_in_string());
     }
-    std::cout<<"\n";
+    return returning_;
     
 }
 bool Poly::max_poly(){
@@ -285,12 +285,23 @@ bool Poly::max_poly(){
     
 
 int main(){
-    Poly("-x^2+x-1","-x^3+3x^2-3x+5",'x');
-    Poly("x^2-2","2x^4-3x^3-3x^2+6x-2",'x');
-    Poly("x^2-2","x^3-3x^2+5x-3",'x');
-    Poly("2-x^2","x^4-5x+6",'x');
-    Poly("x^2-2","x^4",'x');
-    Poly("x^2-2","x^4+x^3",'x');
-    Poly("x+1","x^3+1",'x');
+    Poly testing_("-x^2+x-1","-x^3+3x^2-3x+5",'x');
+    std::vector<std::string> divison_answer = testing_.divide();
+    // Returns quoitent,reminder
+    std::cout<<divison_answer.at(0)<<" "<<divison_answer.at(1)<<std::endl;
+    /* All the testing sets
+    // Poly testing_("x^2-2","2x^4-3x^3-3x^2+6x-2",'x');
+    std::cout<<divison_answer.at(0)<<" "<<divison_answer.at(1)<<std::endl;
+    // Poly testing_("x^2-2","x^3-3x^2+5x-3",'x');
+    std::cout<<divison_answer.at(0)<<" "<<divison_answer.at(1)<<std::endl;
+    // Poly testing_("2-x^2","x^4-5x+6",'x');
+    std::cout<<divison_answer.at(0)<<" "<<divison_answer.at(1)<<std::endl;
+    // Poly testing_("x^2-2","x^4",'x');
+    std::cout<<divison_answer.at(0)<<" "<<divison_answer.at(1)<<std::endl;
+    // Poly testing_("x^2-2","x^4+x^3",'x');
+    std::cout<<divison_answer.at(0)<<" "<<divison_answer.at(1)<<std::endl;
+    // Poly testing_("x+1","x^3+1",'x');
+    std::cout<<divison_answer.at(0)<<" "<<divison_answer.at(1)<<std::endl;
+    */
     return 0;
 }
