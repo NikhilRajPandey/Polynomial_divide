@@ -261,6 +261,9 @@ std::vector<std::string> Poly::divide(){
         }
     }
     // The terms that function not divided it will be in the dividend that will be our reminder
+    if(dividend.size() == 0){ // Means reminder is 0
+        return {this->build_equation_from_terms(quiotent),"0"};
+    }
     return {this->build_equation_from_terms(quiotent),this->build_equation_from_terms(dividend)};
     
 }
