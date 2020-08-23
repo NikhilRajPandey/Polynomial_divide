@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <sstream>
 
+/* Note: I have writed some code in comments for debugging purpose */ 
 struct Term{
     char variable;
     int var_pow;
@@ -154,35 +155,37 @@ class Poly{
         int give_same_power_term(Term &matching_term){
             // std::cout<<"Eroor"<<std::endl;
             int size_dividend = this->term_sp_dividend.size();
-            int matchin_inde = -1; // Not Defined
+            int matchin_inde = 0; // Not Defined
+
+            // std::cout<<"\nMatchin_term: "<<matching_term.give_in_string()<<" "<<matching_term.var_pow<<std::endl;
+
             for (int inde = 0; inde < size_dividend; inde++){
+
+                // std::cout<<"Term: "<<term_sp_dividend.at(inde).give_in_string()<<" "<<term_sp_dividend.at(inde).var_pow<<std::endl;
+
                 if(this->term_sp_dividend.at(inde).var_pow == matching_term.var_pow){
                     return inde;
                 }
-                if(matchin_inde < 0){
-                    if(inde - 1 == -1){
-                        if(this->term_sp_dividend.at(inde).var_pow < matching_term.var_pow){
-                            matchin_inde = inde;
-                        }
-                    }
-                    if(inde + 1 == size_dividend){
-                        if(this->term_sp_dividend.at(inde).var_pow > matching_term.var_pow){
-                            matchin_inde = inde;
-                        }
-                    }
-                    else{
-                        if(this->term_sp_dividend.at(inde).var_pow < matching_term.var_pow && this->term_sp_dividend.at(inde+1).var_pow > matching_term.var_pow){
-                            matchin_inde = inde+1;
-                        }
-                    }
+                // If our matching_term is greater than the current term means that i will not find any maching_term cause the terms are in standard form/sorted by their power
+                /* Reference: https://www.geeksforgeeks.org/adding-two-polynomials-using-linked-list/ */
+                else if(matching_term.var_pow > this->term_sp_dividend.at(inde).var_pow){
+
+                    // std::cout<<"True"<<std::endl;
+                    matchin_inde = inde - 1;
+                    break;
                 }
             }
-            // If the same power term not found then its time to create one
+            // std::cout<<"\nTerm Not Found"<<std::endl;
+
+            // Means the all the term in dividend are smaller than matching_term or the size is 0 in dividend
+            // and the same power term not found then its time to create one
             Term default_term;
             default_term.var_pow = matching_term.var_pow;
             default_term.coefficient = 0;
             default_term.variable = this->variable;
-            if(size_dividend == 0){matchin_inde = 0;}
+
+            // Now Seeing Where I have to add this term
+            if(size_dividend == 0 or matchin_inde == -1){matchin_inde = 0;}
             this->term_sp_dividend.insert(this->term_sp_dividend.begin()+matchin_inde,default_term);
             return matchin_inde;
         }
@@ -252,6 +255,7 @@ std::vector<std::string> Poly::divide(){
                 faOfDvTe.coefficient = quoitent_term.coefficient * divisor.at(n_trav).coefficient;
 
                 int matching_term_index = this->give_same_power_term(faOfDvTe);
+                // Now Subtracting
                 dividend.at(matching_term_index).coefficient = dividend.at(matching_term_index).coefficient - faOfDvTe.coefficient;
 
                 if(dividend.at(matching_term_index).coefficient == 0){
@@ -288,23 +292,24 @@ bool Poly::max_poly(){
     
 
 int main(){
-    Poly testing_("-x^2+x-1","-x^3+3x^2-3x+5",'x');
-    std::vector<std::string> divison_answer = testing_.divide();
-    // Returns quoitent,reminder
-    std::cout<<divison_answer.at(0)<<" "<<divison_answer.at(1)<<std::endl;
-    /* All the testing sets
+    // Poly testing_("-x^2+x-1","-x^3+3x^2-3x+5",'x');
+    /* All the testing sets */
     // Poly testing_("x^2-2","2x^4-3x^3-3x^2+6x-2",'x');
-    std::cout<<divison_answer.at(0)<<" "<<divison_answer.at(1)<<std::endl;
+    // std::cout<<divison_answer.at(0)<<" "<<divison_answer.at(1)<<std::endl;
     // Poly testing_("x^2-2","x^3-3x^2+5x-3",'x');
-    std::cout<<divison_answer.at(0)<<" "<<divison_answer.at(1)<<std::endl;
+    // std::cout<<divison_answer.at(0)<<" "<<divison_answer.at(1)<<std::endl;
     // Poly testing_("2-x^2","x^4-5x+6",'x');
-    std::cout<<divison_answer.at(0)<<" "<<divison_answer.at(1)<<std::endl;
+    // std::cout<<divison_answer.at(0)<<" "<<divison_answer.at(1)<<std::endl;
     // Poly testing_("x^2-2","x^4",'x');
-    std::cout<<divison_answer.at(0)<<" "<<divison_answer.at(1)<<std::endl;
+    // std::cout<<divison_answer.at(0)<<" "<<divison_answer.at(1)<<std::endl;
     // Poly testing_("x^2-2","x^4+x^3",'x');
+    // std::cout<<divison_answer.at(0)<<" "<<divison_answer.at(1)<<std::endl;
+    Poly testing_("x+1","x^3+1",'x');
+    // std::cout<<divison_answer.at(0)<<" "<<divison_answer.at(1)<<std::endl;
+
+    // Returns quoitent,reminder
+    std::vector<std::string> divison_answer = testing_.divide();
     std::cout<<divison_answer.at(0)<<" "<<divison_answer.at(1)<<std::endl;
-    // Poly testing_("x+1","x^3+1",'x');
-    std::cout<<divison_answer.at(0)<<" "<<divison_answer.at(1)<<std::endl;
-    */
+
     return 0;
 }
